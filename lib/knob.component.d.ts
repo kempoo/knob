@@ -1,0 +1,32 @@
+import { EventEmitter, ElementRef } from '@angular/core';
+import { ControlValueAccessor } from '@angular/forms';
+export declare class KnobComponent implements ControlValueAccessor {
+    min: number;
+    max: number;
+    startDegree: number;
+    endDegree: number;
+    intensive: boolean;
+    knobDiv: ElementRef;
+    meterValue: number;
+    change: EventEmitter<number>;
+    private meterRotation;
+    private tmpMeterRotation;
+    private startX;
+    private startY;
+    private maxDistance;
+    private changed;
+    private touched;
+    constructor();
+    ngOnInit(): void;
+    getMouseDifference(e: any): number;
+    getMaxDegrees(): number;
+    private calculateDialAngle;
+    calculateChange(mousePositionChange: number): void;
+    getMousePosition(event: any): any;
+    setChangeListener(e: any): void;
+    writeValue(obj: any): void;
+    registerOnChange(fn: any): void;
+    notifyChange(): void;
+    registerOnTouched(fn: any): void;
+    notifyTouch(): void;
+}

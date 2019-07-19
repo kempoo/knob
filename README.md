@@ -1,5 +1,7 @@
 # Knob Widget
 
+Overwrite on https://github.com/spheras/knob for e2e project.
+
 Knob is an [Angular](https://github.com/angular/angular) component to set values with the typical Knob control (for instance, very used in music hardware).  The 
 component is very basic, you just need to configure the range of values admited, and the degrees the knob can manage. This component doesn't suply any skin by itself but you can find some example skins here too: https://github.com/spheras/knob/tree/master/skins  
 
@@ -14,13 +16,13 @@ The following are two examples of what you can achieve with this component:
 ## Installing the Component
 First of all you'll need to add it to your project as a dependency, i.e. with npm:
 
-`npm install ng2-knob --save`
+`npm install ng2-knob-e2e --save`
 
 ## Using the Component
 Using Knob widget is pretty simple. First, import the component inside the module of your Angular Application, like this:
 
 ```javascript
-import { KnobModule } from 'ng2-knob';
+import { KnobModule } from 'ng2-knob-e2e';
 ...
 @NgModule({
  ...

@@ -1,7 +1,7 @@
 {
-  "name": "ng2-knob",
-  "version": "1.1.0",
-  "description": "Angular 2 Knob Component",
+  "name": "ng2-knob-e2e",
+  "version": "1.0.2",
+  "description": "Angular 2 Knob Component for e2e",
   "scripts": {
     "start": "npm run build && concurrently \"tsc -w\" \"lite-server\" ",
     "e2e": "npm run build && concurrently \"http-server -s\" \"protractor protractor.config.js\" --kill-others --success first",
@@ -12,20 +12,20 @@
     "test-once": "npm run build && karma start karma.conf.js --single-run",
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "build": "rm -rf lib && tsc -p src && tsc",
+    "build": "tsc -p src && tsc",
     "prepublish": "npm run ngc-build",
-    "ngc-build": "rm -rf lib && rm -rf \"src/node_modules\" && \"node_modules/.bin/ngc\" -p tsconfig-aot.json"
+    "ngc-build": "tsconfig-aot.json"
   },
   "main": "./index.js",
   "types": "./index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/spheras/knob.git"
+    "url": "git+https://github.com/kempoo/knob.git"
   },
   "author": "José Amuedo",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/spheras/knob/issues"
+    "url": "https://github.com/kempoo/knob/issues"
   },
   "homepage": "https://github.com/spheras/knob#readme",
   "dependencies": {},
