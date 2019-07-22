@@ -20,7 +20,7 @@ export declare class KnobComponent implements ControlValueAccessor {
     ngOnInit(): void;
     getMouseDifference(e: any): number;
     getMaxDegrees(): number;
-    private calculateDialAngle;
+    private calculateDialAngle();
     calculateChange(mousePositionChange: number): void;
     getMousePosition(event: any): any;
     setChangeListener(e: any): void;
