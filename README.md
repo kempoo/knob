@@ -2,7 +2,7 @@
 
 Overwrite on https://github.com/spheras/knob for e2e project.
 
-Changelog from original repo:
+**Changelog vs original repo:**
 1. Modified mouse change event - fix for knob arrow placement bug;
 2. Added step parameter for knob component;
 
