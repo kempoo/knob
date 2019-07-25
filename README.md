@@ -12,7 +12,7 @@ component is very basic, you just need to configure the range of values admited,
 The following are two examples of what you can achieve with this component:
 
 ![](./etc/knob-special.gif)  
-![](./etc/knob6.gif)
+![](./etc/knob-6.gif)
   
   
 ## Getting Started  
