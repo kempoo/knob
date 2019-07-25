@@ -3,6 +3,7 @@ import { ControlValueAccessor } from '@angular/forms';
 export declare class KnobComponent implements ControlValueAccessor {
     min: number;
     max: number;
+    step: number;
     startDegree: number;
     endDegree: number;
     intensive: boolean;
@@ -13,14 +14,17 @@ export declare class KnobComponent implements ControlValueAccessor {
     private tmpMeterRotation;
     private startX;
     private startY;
+    private centerX;
+    private centerY;
     private maxDistance;
     private changed;
     private touched;
     constructor();
     ngOnInit(): void;
+    ngAfterViewChecked(): void;
     getMouseDifference(e: any): number;
     getMaxDegrees(): number;
-    private calculateDialAngle();
+    private calculateDialAngle;
     calculateChange(mousePositionChange: number): void;
     getMousePosition(event: any): any;
     setChangeListener(e: any): void;

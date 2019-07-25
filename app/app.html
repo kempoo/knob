@@ -1,0 +1,51 @@
+<h3>Angular 2 Knob Component</h3>
+
+<div class="container">
+    <knob class="skin0" #myknob1 [min]="20" [max]="100" [value]="50" [startDegree]="200" [endDegree]="280"
+        (change)="debug($event)"></knob>
+    <div class="info bpm">{{myknob1.meterValue}} bpm</div>
+</div>
+
+<div class="container">
+    <knob class="skin1" [min]="10" [max]="200" [startDegree]="200" [endDegree]="120" [(ngModel)]="myknob1_meterValue">
+    </knob>
+    <div class="info bpm">{{myknob1_meterValue}} bpm</div>
+    <button (click)="myknob1_meterValue = 150">Set 150</button>
+</div>
+
+<div class="container cm">
+    <knob class="skin2" [min]="0" [max]="500" [startDegree]="0" [endDegree]="360" [(ngModel)]="myknob2_meterValue">
+    </knob>
+    <div class="info cm">{{myknob2_meterValue}} cm</div>
+    <input class="input cm" [(ngModel)]="myknob2_meterValue">
+</div>
+<div class="container degree">
+    <knob class="skin3" [min]="0" [max]="100" [startDegree]="0" [endDegree]="360" [(ngModel)]="myknob3_meterValue">
+    </knob>
+    <div class="info degree">{{myknob3_meterValue}} º</div>
+</div>
+<div class="container freq">
+    <knob class="skin4" [min]="-6" [max]="6" [startDegree]="228" [endDegree]="130" [(ngModel)]="myknob4_meterValue">
+    </knob>
+    <div class="info freq">{{myknob4_meterValue}} freq</div>
+</div>
+<div class="container freq2">
+    <knob class="skin5" [min]="-6" [max]="6" [startDegree]="228" [endDegree]="130" [(ngModel)]="myknob4_meterValue">
+    </knob>
+    <div class="info freq2">{{myknob4_meterValue}} freq</div>
+</div>
+<div id="sliderContainer" class="container degree" style="width:500px;">
+    <knob class="skin-special" #knob [min]="2000" [max]="100000" [value]="40000" [startDegree]="140" [endDegree]="400" [step]=500>
+    </knob>
+    <div class="info bpm">{{knob.meterValue}}</div>
+    <div class="display-flex space-between text-center text-light-grey font-15">
+        <div class="">
+            <div> MIN</div>
+            <div id="minim">2000</div>
+        </div>
+        <div class="">
+            <div> MAX</div>
+            <div id="maxim">100000</div>
+        </div>
+    </div>
+</div>

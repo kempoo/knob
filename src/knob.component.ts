@@ -1,13 +1,13 @@
 import {
-  Component, Input, Output, EventEmitter, ViewChild, ElementRef, forwardRef
+	Component, Input, Output, EventEmitter, ViewChild, ElementRef, forwardRef
 } from '@angular/core';
-import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
-    template: `
+	template: `
 <div #knob class="knob"></div>
 `,
-    styles: [`
+	styles: [`
     .knob{
         width:100%;
         height:100%;
@@ -15,12 +15,12 @@ import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
         cursor:pointer;
     }
 `],
-    selector: 'knob',
-  providers: [{
-    provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => KnobComponent),
-    multi: true
-  }]
+	selector: 'knob',
+	providers: [{
+		provide: NG_VALUE_ACCESSOR,
+		useExisting: forwardRef(() => KnobComponent),
+		multi: true
+	}]
 })
 
 /**
@@ -29,227 +29,251 @@ import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
  * @description a knob component based on https://github.com/joedotjs/ngKnob/blob/master/dist/ngKnob.js
  */
 export class KnobComponent implements ControlValueAccessor {
-  /** the minimum possible value */
-    @Input('min') min: number = 0;
-    /** the maximum possible value */
-    @Input('max') max: number = 0;
+	/** the minimum possible value */
+	@Input('min') min: number = 0;
+	/** the maximum possible value */
+	@Input('max') max: number = 0;
+	/** knob step */
+	@Input('step') step: number = 0;
 
-    /** the start degree for the knob */
-    @Input('startDegree') startDegree: number = 200;
-    /** the end degree for the knob */
-    @Input('endDegree') endDegree: number = 120;
+	/** the start degree for the knob */
+	@Input('startDegree') startDegree: number = 200;
+	/** the end degree for the knob */
+	@Input('endDegree') endDegree: number = 120;
 
-    /** if the emition of events is intensive or not */
-    @Input('intensive') intensive: boolean = true;
+	/** if the emition of events is intensive or not */
+	@Input('intensive') intensive: boolean = true;
 
-    @ViewChild('knob') knobDiv: ElementRef;
+	@ViewChild('knob') knobDiv: ElementRef;
 
-    /** the real meter value */
-    @Input('value') meterValue: number = 0;
+	/** the real meter value */
+	@Input('value') meterValue: number = 0;
 
-    /** the change event to notify the new value */
-    @Output('change') change: EventEmitter<number> = new EventEmitter<number>(false);
+	/** the change event to notify the new value */
+	@Output('change') change: EventEmitter<number> = new EventEmitter<number>(false);
 
-  /** the current rotation persisted (not persisted until the touch/mouse down is released) */
-    private meterRotation: number = 0;
-    /** the temporal meter rotation we have until the touch/mousedown is released */
-    private tmpMeterRotation: number = 0;
-    private startX: number = 0;
-    private startY: number = 0;
-    //this is the max distance calculated to complete the 360º
-    private maxDistance: number = 0;
+	/** the current rotation persisted (not persisted until the touch/mouse down is released) */
+	private meterRotation: number = 0;
+	/** the temporal meter rotation we have until the touch/mousedown is released */
+	private tmpMeterRotation: number = 0;
+	private startX: number = 0;
+	private startY: number = 0;
+	private centerX: number = 0;
+	private centerY: number = 0;
+	//this is the max distance calculated to complete the 360º
+	private maxDistance: number = 0;
 
-    /** 2-way binding listeners **/
-    private changed: any[] = [];
-    private touched: any[] = [];
+	/** 2-way binding listeners **/
+	private changed: any[] = [];
+	private touched: any[] = [];
 
-    constructor() {
-        this.maxDistance = document.body.clientHeight;
-        if (document.body.clientWidth > this.maxDistance) {
-            this.maxDistance = document.body.clientWidth;
-        }
-        this.maxDistance = Math.round((this.maxDistance * 10) / 100);
-    }
+	constructor() {
+		this.maxDistance = document.body.clientHeight;
+		if (document.body.clientWidth > this.maxDistance) {
+			this.maxDistance = document.body.clientWidth;
+		}
+		this.maxDistance = Math.round((this.maxDistance * 10) / 100);
+	}
 
-    ngOnInit() {
-        var self = this;
-        this.knobDiv.nativeElement.addEventListener('mousedown', function (e: any) { self.setChangeListener(e); });
-        this.knobDiv.nativeElement.addEventListener('touchstart', function (e: any) { self.setChangeListener(e); });
-        this.calculateDialAngle();
-    }
+	ngOnInit() {
+		var self = this;
+		this.knobDiv.nativeElement.addEventListener('mousedown', function (e: any) { self.setChangeListener(e); });
+		this.knobDiv.nativeElement.addEventListener('touchstart', function (e: any) { self.setChangeListener(e); });
+		this.calculateDialAngle();
+	}
 
-    /**
-     * @name getMouseDifference
-     * @description get the mouse difference between the start down position and the current position
-     * @param
-     */
-    getMouseDifference(e: any) {
-        var mousepos = this.getMousePosition(e);
-        var yMovement = mousepos.clientY - this.startY;
-        var xMovement = mousepos.clientX - this.startX;
-        return yMovement + xMovement;
-    }
+	ngAfterViewChecked() {
+		let rect: any = this.knobDiv.nativeElement.getBoundingClientRect();
+		this.centerX = rect.x + rect.width / 2;
+		this.centerY = rect.y + rect.height / 2;
+	}
 
-    /**
-     * @name getMaxDegrees
-     * @description obtain the max degrees available to move the knob
-     */
-    getMaxDegrees(): number {
-        if (this.endDegree > this.startDegree) {
-            return this.endDegree - this.startDegree;
-        } else if (this.endDegree < this.startDegree) {
-            return 360 + this.endDegree - this.startDegree;
-        } else {
-            return 0;
-        }
-    }
+	/**
+	 * @name getMouseDifference
+	 * @description get the mouse difference between the start down position and the current position
+	 * @param
+	 */
+	getMouseDifference(e: any) {
+		var mousepos = this.getMousePosition(e);
+		var yMovement = mousepos.clientY - this.centerY;
+		var xMovement = mousepos.clientX - this.centerX;
 
-    /**
-     * @name calculateDialAngle
-     * @description calculate the initial rotation based on the value we have initially
-     */
-    private calculateDialAngle() {
-        let norm: number = this.meterValue - this.min;
-        let percent = norm * 100 / (this.max - this.min);
-        let maxdeg = this.getMaxDegrees();
-        let rot = percent * maxdeg / 100;
-        this.meterRotation = rot % 360;
-        rot = rot + this.startDegree;
-        this.knobDiv.nativeElement.style.transform = 'rotate(' + (rot) + 'deg)';
-      this.notifyChange();
-    }
+		let radians = (Math.atan2(yMovement, xMovement)) * (180 / Math.PI);
+		radians = radians - 140;
 
-    /**
-     * @name calculateChange
-     * @description calculates the difference of the knob after a movement of the mouse/finger and render correctly the knob
-     * @param {number} mousePositionChange the difference respect the original position when mousedown/touchstart events
-     */
-    calculateChange(mousePositionChange: number) {
-        var maxDegrees = this.getMaxDegrees();
-        var newValue = mousePositionChange * maxDegrees / this.maxDistance;
-        newValue = (newValue + this.meterRotation);
+		if (radians < 0 && (xMovement > 0 || yMovement < 0)) {
+			radians = 180 + (180 + radians);
+		}
 
-        if (newValue < 0) {
-            newValue = 0;
-        } else if (newValue > maxDegrees) {
-            newValue = maxDegrees;
-        }
-        this.tmpMeterRotation = newValue;
-        //console.log(this.tmpMeterRotation);
+		console.log("x: " + xMovement + ", y: " + yMovement + " = " + radians + ", START DEG:" + this.startDegree);
+		return radians;
+	}
 
-        this.knobDiv.nativeElement.style.transform = 'rotate(' + (newValue + this.startDegree) + 'deg)';
+	/**
+	 * @name getMaxDegrees
+	 * @description obtain the max degrees available to move the knob
+	 */
+	getMaxDegrees(): number {
+		if (this.endDegree > this.startDegree) {
+			return this.endDegree - this.startDegree;
+		} else if (this.endDegree < this.startDegree) {
+			return 360 + this.endDegree - this.startDegree;
+		} else {
+			return 0;
+		}
+	}
 
-        this.meterValue = (100 * newValue) / maxDegrees;
-        var norm = this.max - this.min;
-        this.meterValue = Math.round(((norm * this.meterValue) / 100) + this.min);
+	/**
+	 * @name calculateDialAngle
+	 * @description calculate the initial rotation based on the value we have initially
+	 */
+	private calculateDialAngle() {
+		let norm: number = this.meterValue - this.min;
+		let percent = norm * 100 / (this.max - this.min);
+		let maxdeg = this.getMaxDegrees();
+		let rot = percent * maxdeg / 100;
+		this.meterRotation = rot % 360;
+		rot = rot + this.startDegree;
+		this.knobDiv.nativeElement.style.transform = 'rotate(' + (rot) + 'deg)';
+		this.notifyChange();
+	}
 
-        if (this.intensive) {
-            this.change.emit(this.meterValue);
-            this.notifyChange();
-        }
-    }
+	/**
+	 * @name calculateChange
+	 * @description calculates the difference of the knob after a movement of the mouse/finger and render correctly the knob
+	 * @param {number} mousePositionChange the difference respect the original position when mousedown/touchstart events
+	 */
+	calculateChange(mousePositionChange: number) {
+		var maxDegrees = this.getMaxDegrees();
+		//var newValue = mousePositionChange * maxDegrees / this.maxDistance;
+		//newValue = (newValue + this.meterRotation);
+		var newValue = mousePositionChange;
 
-    /**
-     * @name getMousePosition
-     * @description return the mouse position based en an touch or mouse event
-     */
-    getMousePosition(event: any): any {
-        var result = { clientX: 0, clientY: 0 };
-        if (event.touches) {
-            result.clientX = event.touches[0].clientX;
-            result.clientY = event.touches[0].clientY;
-        } else {
-            result.clientX = event.clientX;
-            result.clientY = event.clientY;
-        }
-        return result;
-    }
+		if (newValue < 0) {
+			newValue = 0;
+		} else if (newValue > maxDegrees) {
+			newValue = maxDegrees;
+		}
+		this.tmpMeterRotation = newValue;
+		//console.log(this.tmpMeterRotation);
 
-    /**
-     * @name setChangeListener
-     * @description after set the mousedown event, we start listenng the move event
-     * @param {MouseEvent or TouchEvent} e event
-     */
-    setChangeListener(e: any) {
-        if (e.stopPropagation) e.stopPropagation();
-        if (e.preventDefault) e.preventDefault();
+		this.knobDiv.nativeElement.style.transform = 'rotate(' + (newValue + this.startDegree) + 'deg)';
 
-        var self = this;
-        var mousepos = this.getMousePosition(e);
-        this.startX = mousepos.clientX;
-        this.startY = mousepos.clientY;
-        var funcMove = function (e: any) {
-            if (e.stopPropagation) e.stopPropagation();
-            if (e.preventDefault) e.preventDefault();
-            var change = self.getMouseDifference(e);
-            self.calculateChange(change);
-        }
-        var funcRemove = function (e: any) {
-            if (!self.intensive) {
-                self.change.emit(self.meterValue);
-                self.notifyChange();
-            }
-            if (e.stopPropagation) e.stopPropagation();
-            if (e.preventDefault) e.preventDefault();
-            self.startX = 0;
-            self.startY = 0;
-            self.meterRotation = self.tmpMeterRotation;
-            document.removeEventListener('mousemove', funcMove);
-            document.removeEventListener('touchmove', funcMove);
-            document.removeEventListener('mouseup', funcRemove);
-            document.removeEventListener('touchend', funcRemove);
-        }
+		this.meterValue = (100 * newValue) / maxDegrees;
+		var norm = this.max - this.min;
+		this.meterValue = Math.round(((norm * this.meterValue) / 100) + this.min);
 
-        document.addEventListener('mousemove', funcMove, false);
-        document.addEventListener('touchmove', funcMove, false);
-        document.addEventListener('mouseup', funcRemove, false);
-        document.addEventListener('touchend', funcRemove, false);
-    }
+		if (this.step && this.step < this.max) {
+			this.meterValue = this.meterValue - this.meterValue % this.step;
+		}
 
-  /**
-   * @name writeValue
-   * @description write new value to the model
-   * @param {New value} obj any
-   */
-  writeValue(obj: any): void {
-    if (obj == null)
-      return;
+		if (this.intensive) {
+			this.change.emit(this.meterValue);
+			this.notifyChange();
+		}
+	}
 
-    this.meterValue = obj;
-    this.calculateDialAngle();
-  }
+	/**
+	 * @name getMousePosition
+	 * @description return the mouse position based en an touch or mouse event
+	 */
+	getMousePosition(event: any): any {
+		var result = { clientX: 0, clientY: 0 };
+		if (event.touches) {
+			result.clientX = event.touches[0].clientX;
+			result.clientY = event.touches[0].clientY;
+		} else {
+			result.clientX = event.clientX;
+			result.clientY = event.clientY;
+		}
+		return result;
+	}
 
-  /**
-   * @name registerOnChange
-   * @description register new onChange event listener
-   * @param {method to call} fn any
-   */
-  registerOnChange(fn: any): void {
-    this.changed.push(fn);
-  }
+	/**
+	 * @name setChangeListener
+	 * @description after set the mousedown event, we start listenng the move event
+	 * @param {MouseEvent or TouchEvent} e event
+	 */
+	setChangeListener(e: any) {
+		if (e.stopPropagation) e.stopPropagation();
+		if (e.preventDefault) e.preventDefault();
 
-  /**
-   * @name notifyChange
-   * @description notify touch listeners when touched
-   */
-  notifyChange() {
-    this.changed.forEach(f => f(this.meterValue));
-  }
+		var self = this;
+		var mousepos = this.getMousePosition(e);
+		this.startX = mousepos.clientX;
+		this.startY = mousepos.clientY;
+		var funcMove = function (e: any) {
+			if (e.stopPropagation) e.stopPropagation();
+			if (e.preventDefault) e.preventDefault();
+			var change = self.getMouseDifference(e);
+			self.calculateChange(change);
+		}
+		var funcRemove = function (e: any) {
+			if (!self.intensive) {
+				self.change.emit(self.meterValue);
+				self.notifyChange();
+			}
+			if (e.stopPropagation) e.stopPropagation();
+			if (e.preventDefault) e.preventDefault();
+			self.startX = 0;
+			self.startY = 0;
+			self.meterRotation = self.tmpMeterRotation;
+			document.removeEventListener('mousemove', funcMove);
+			document.removeEventListener('touchmove', funcMove);
+			document.removeEventListener('mouseup', funcRemove);
+			document.removeEventListener('touchend', funcRemove);
+		}
 
-  /**
-   * @name registerOnTouched
-   * @description register new onTouched event listener
-   * @param {method to call} fn any
-   */
-  registerOnTouched(fn: any): void {
-    this.touched.push(fn);
-  }
+		document.addEventListener('mousemove', funcMove, false);
+		document.addEventListener('touchmove', funcMove, false);
+		document.addEventListener('mouseup', funcRemove, false);
+		document.addEventListener('touchend', funcRemove, false);
+	}
 
-  /**
-   * @name notifyTouch
-   * @description notify touch listeners when touched
-   */
-  notifyTouch() {
-    this.touched.forEach(f => f());
-  }
+	/**
+	 * @name writeValue
+	 * @description write new value to the model
+	 * @param {New value} obj any
+	 */
+	writeValue(obj: any): void {
+		if (obj == null)
+			return;
+
+		this.meterValue = obj;
+		this.calculateDialAngle();
+	}
+
+	/**
+	 * @name registerOnChange
+	 * @description register new onChange event listener
+	 * @param {method to call} fn any
+	 */
+	registerOnChange(fn: any): void {
+		this.changed.push(fn);
+	}
+
+	/**
+	 * @name notifyChange
+	 * @description notify touch listeners when touched
+	 */
+	notifyChange() {
+		this.changed.forEach(f => f(this.meterValue));
+	}
+
+	/**
+	 * @name registerOnTouched
+	 * @description register new onTouched event listener
+	 * @param {method to call} fn any
+	 */
+	registerOnTouched(fn: any): void {
+		this.touched.push(fn);
+	}
+
+	/**
+	 * @name notifyTouch
+	 * @description notify touch listeners when touched
+	 */
+	notifyTouch() {
+		this.touched.forEach(f => f());
+	}
 }

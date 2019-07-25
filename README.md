@@ -2,6 +2,10 @@
 
 Overwrite on https://github.com/spheras/knob for e2e project.
 
+Changelog from original repo:
+1. Modified mouse change event - fix for knob arrow placement bug;
+2. Added step parameter for knob component;
+
 Knob is an [Angular](https://github.com/angular/angular) component to set values with the typical Knob control (for instance, very used in music hardware).  The 
 component is very basic, you just need to configure the range of values admited, and the degrees the knob can manage. This component doesn't suply any skin by itself but you can find some example skins here too: https://github.com/spheras/knob/tree/master/skins  
 
@@ -71,6 +75,10 @@ To use correctly the knob, you will need probably a container and a div (like in
 
 - The maximum value you need for the range of values [min,max]
 
+### step (type: number)
+
+- knob step which defines minum value for meterValue to change its value
+
 ### value (type: number)
 
 - The starting value you want for the knob. Consider to put a value between min and max.
@@ -109,7 +117,7 @@ Example:
 The component emit an event at every change value of the knob. You can listen to these events using the **change** property with the **$event** property received.
 
 ```javascript
- <knob class="skin1" #myknob1 [min]="10" [max]="200" [value]="80" [startDegree]="200"  [endDegree]="120" (change)="console.log($event);"></knob>
+ <knob class="skin1" #myknob1 [min]="10" [max]="200" [step]="10" [value]="80" [startDegree]="200"  [endDegree]="120" (change)="console.log($event);"></knob>
 ```
 ## Double Binding ngModel
 
