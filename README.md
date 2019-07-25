@@ -11,8 +11,8 @@ component is very basic, you just need to configure the range of values admited,
 
 The following are two examples of what you can achieve with this component:
 
-![alt tag](https://raw.githubusercontent.com/spheras/knob/master/etc/knob5.gif)  
-![alt tag](https://raw.githubusercontent.com/spheras/knob/master/etc/knob3.gif)
+![alt tag](https://raw.githubusercontent.com/kempoo/knobmaster/etc/knob-special.gif)  
+![alt tag](https://raw.githubusercontent.com/kempoo/knobmaster/etc/knob6.gif)
   
   
 ## Getting Started  
